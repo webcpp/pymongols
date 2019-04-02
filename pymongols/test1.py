@@ -1,19 +1,3 @@
-# pymongols
-call mongols from python
-
-## dependency
-- [mongols](https://github.com/webcpp/mongols)
-- python3-devel
-
-
-## install
-
-`make clean && make && sudo make install`
-
-## usage
-
-```python
-
 import pymongols
 
 
@@ -40,6 +24,3 @@ server = pymongols.http_server(config['host'],config['port'],config['timeout'],c
 
 
 server.run(req_filter,res_filter)
-
-
-```
