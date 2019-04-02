@@ -8,7 +8,7 @@ mongols for python
 
 ## install
 
-`make clean && make && sudo make install`
+`cd pymongols && make clean && make && sudo make install`
 
 ## usage
 
