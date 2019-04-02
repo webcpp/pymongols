@@ -12,6 +12,7 @@ public:
     py_http_server() = delete;
     py_http_server(const std::string& host, int port, int timeout, size_t buffer_size, size_t thread_size, size_t max_body_size, int max_event_size)
         : server(0)
+        , is_daemon(false)
     {
         this->server = new mongols::http_server(host, port, timeout, buffer_size, thread_size, max_body_size, max_event_size);
     }
@@ -23,6 +24,9 @@ public:
     }
     void run(pybind11::function req_filter, pybind11::function res_filter)
     {
+        if (this->is_daemon) {
+            daemon(0, 1);
+        }
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
         };
@@ -42,6 +46,9 @@ public:
 
     void run_with_route(pybind11::function req_filter)
     {
+        if (this->is_daemon) {
+            daemon(0, 1);
+        }
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
         };
@@ -112,6 +119,11 @@ public:
         this->server->set_enable_security_check(b);
     }
 
+    void set_enable_daemon(bool b)
+    {
+        this->is_daemon = b;
+    }
+
     static void set_blacklist_size(size_t size)
     {
         mongols::tcp_server::backlist_size = size;
@@ -135,7 +147,7 @@ public:
 
 private:
     mongols::http_server* server;
-    std::vector<std::function<void(const mongols::request&, mongols::response&, const std::vector<std::string>&)>> route_handler;
+    bool is_daemon;
 };
 
 #endif
