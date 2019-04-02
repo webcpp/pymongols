@@ -1,5 +1,5 @@
 # pymongols
-call mongols from python
+mongols for python
 
 ## dependency
 - [mongols](https://github.com/webcpp/mongols)
@@ -43,4 +43,4 @@ server.run(req_filter,res_filter)
 
 
 ```
-mongols for python
+
