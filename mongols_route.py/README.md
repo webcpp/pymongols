@@ -5,5 +5,5 @@
 
 ## usage
 
-`python3 setup.py install` or `python2 setup install`
+`python3 setup.py install` or `python2 setup.py install`
 
