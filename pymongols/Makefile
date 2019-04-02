@@ -1,5 +1,5 @@
-
-PROJECT=pymongols$(shell python3-config --extension-suffix)
+PYVERSION=3.5
+PROJECT=pymongols$(shell python$(PYVERSION)-config --extension-suffix)
 CPPSRC=$(shell find src -type f -name *.cpp)
 CPPOBJ=$(patsubst %.cpp,%.o,$(CPPSRC))
 CCSRC=$(shell find src -type f -name *.cc)
@@ -15,14 +15,14 @@ OBJ=$(COBJ) $(CXXOBJ) $(CCOBJ) $(CPPOBJ)
 CC=gcc
 CXX=g++
 
-CFLAGS+=-O3 -std=c11 -Wall -fPIC `python3-config --cflags` `pkg-config --cflags mongols openssl`
-CXXFLAGS+=-O3 -std=c++11 -Wall -fPIC `python3-config --cflags` `pkg-config --cflags mongols openssl`
-LDLIBS+=`python3-config --libs` `pkg-config --libs mongols openssl`
+CFLAGS+=-O3 -std=c11 -Wall -fPIC `python$(PYVERSION)-config --cflags` `pkg-config --cflags mongols openssl`
+CXXFLAGS+=-O3 -std=c++11 -Wall -fPIC `python$(PYVERSION)-config --cflags` `pkg-config --cflags mongols openssl`
+LDLIBS+=`python$(PYVERSION)-config --libs` `pkg-config --libs mongols openssl`
 LDFLAGS+=-shared
 
 
 ifndef INSTALL_DIR
-INSTALL_DIR=/usr/lib/python3.5/lib-dynload/
+INSTALL_DIR=/usr/lib/python$(PYVERSION)/lib-dynload
 endif
 
 

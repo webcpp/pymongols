@@ -51,6 +51,5 @@ wheels/
 *.egg
 
 /.vscode
-mongols_route.py/__pycache__/mongols_route.cpython-35.pyc
-pymongols/python/templates/__jinja2_15611ede1476b3d60eb601cf769e426774331ee2.cache
-pymongols/python/templates/__jinja2_c5e95b28437b6170cd9f0aa4e6f9c3258183dea6.cache
+*.pyc
+*.cache
