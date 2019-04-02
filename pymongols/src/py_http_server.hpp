@@ -25,7 +25,7 @@ public:
     void run(pybind11::function req_filter, pybind11::function res_filter)
     {
         if (this->is_daemon) {
-            daemon(0, 1);
+            daemon(1, 0);
         }
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
@@ -47,7 +47,7 @@ public:
     void run_with_route(pybind11::function req_filter)
     {
         if (this->is_daemon) {
-            daemon(0, 1);
+            daemon(1, 0);
         }
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
