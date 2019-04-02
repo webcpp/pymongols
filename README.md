@@ -12,6 +12,10 @@ mongols for python
 
 ## usage
 
+see `test`
+
+## hello world
+
 ```python
 
 import pymongols
