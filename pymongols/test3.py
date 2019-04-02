@@ -11,10 +11,12 @@ config['thread_size']=0
 config['max_body_size']=4096
 config['max_event_size']=64
 
-#server.set_enable_lru_cache(True)
-#server.set_lru_cache_expires(1)
+
 
 server = pymongols.http_server(config['host'],config['port'],config['timeout'],config['buffer_size'],config['thread_size'],config['max_body_size'],config['max_event_size'])
+
+#server.set_enable_lru_cache(True)
+#server.set_lru_cache_expires(1)
 
 def req_filter(req):
     return True
