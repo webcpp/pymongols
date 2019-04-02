@@ -3,7 +3,7 @@ mongols for python
 
 ## dependency
 - [mongols](https://github.com/webcpp/mongols)
-- python3-devel
+- python2,3 devel
 
 
 ## install

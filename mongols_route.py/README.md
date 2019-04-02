@@ -1,4 +1,5 @@
 # dependency
+- python2,3
 - setuptools
 - jinja2
 
