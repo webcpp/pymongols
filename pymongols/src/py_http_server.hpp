@@ -5,7 +5,9 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11/stl_bind.h"
+#include <fstream>
 #include <mongols/http_server.hpp>
+#include <unistd.h>
 
 class py_http_server {
 public:
@@ -13,6 +15,7 @@ public:
     py_http_server(const std::string& host, int port, int timeout, size_t buffer_size, size_t thread_size, size_t max_body_size, int max_event_size)
         : server(0)
         , is_daemon(false)
+        , pidfile()
     {
         this->server = new mongols::http_server(host, port, timeout, buffer_size, thread_size, max_body_size, max_event_size);
     }
@@ -26,6 +29,7 @@ public:
     {
         if (this->is_daemon) {
             daemon(1, 0);
+            this->create_pidfile();
         }
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
@@ -48,6 +52,7 @@ public:
     {
         if (this->is_daemon) {
             daemon(1, 0);
+            this->create_pidfile();
         }
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
@@ -124,6 +129,11 @@ public:
         this->is_daemon = b;
     }
 
+    void set_pidfile(const std::string& path)
+    {
+        this->pidfile = path;
+    }
+
     static void set_blacklist_size(size_t size)
     {
         mongols::tcp_server::backlist_size = size;
@@ -148,6 +158,16 @@ public:
 private:
     mongols::http_server* server;
     bool is_daemon;
+    std::string pidfile;
+
+private:
+    void create_pidfile()
+    {
+        if (!this->pidfile.empty()) {
+            std::ofstream file(this->pidfile);
+            file << getpid();
+        }
+    }
 };
 
 #endif

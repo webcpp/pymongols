@@ -53,3 +53,4 @@ wheels/
 /.vscode
 *.pyc
 *.cache
+*.pid
