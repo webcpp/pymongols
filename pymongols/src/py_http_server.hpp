@@ -5,10 +5,10 @@
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 #include "pybind11/stl_bind.h"
-#include <unistd.h>
 #include <fstream>
 #include <mongols/http_server.hpp>
-
+#include <mongols/util.hpp>
+#include <unistd.h>
 
 class py_http_server {
 public:
@@ -24,21 +24,46 @@ public:
     {
         if (this->server) {
             delete this->server;
+            if (!this->pidfile.empty()) {
+                remove(this->pidfile.c_str());
+            }
         }
     }
     void run(pybind11::function req_filter, pybind11::function res_filter)
     {
         if (this->is_daemon) {
             daemon(1, 0);
-            this->create_pidfile();
         }
+        this->create_pidfile();
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
         };
         auto g = [&](const mongols::request& req, mongols::response& res) {
             res_filter(req, &res);
         };
-        this->server->run(f, g);
+
+        //        this->server->run(f, g);
+
+        std::function<void(pthread_mutex_t*, size_t*)> ff = [&](pthread_mutex_t* mtx, size_t* data) {
+            std::string i;
+            pthread_mutex_lock(mtx);
+            if (*data > std::thread::hardware_concurrency() - 1) {
+                *data = 0;
+            }
+            i = std::move(std::to_string(*data));
+            *data = (*data) + 1;
+            pthread_mutex_unlock(mtx);
+            mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+            this->server->set_db_path("pymongols.leveldb/" + i);
+            this->server->run(f, g);
+        };
+
+        std::function<bool(int)> gg = [&](int status) {
+            return false;
+        };
+
+        mongols::multi_process main_process;
+        main_process.run(ff, gg);
     }
 
     void add_route(const std::list<std::string>& method, const std::string& pattern, pybind11::function fun)
@@ -53,12 +78,33 @@ public:
     {
         if (this->is_daemon) {
             daemon(1, 0);
-            this->create_pidfile();
         }
+        this->create_pidfile();
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
         };
-        this->server->run_with_route(f);
+        //this->server->run_with_route(f);
+
+        std::function<void(pthread_mutex_t*, size_t*)> ff = [&](pthread_mutex_t* mtx, size_t* data) {
+            std::string i;
+            pthread_mutex_lock(mtx);
+            if (*data > std::thread::hardware_concurrency() - 1) {
+                *data = 0;
+            }
+            i = std::move(std::to_string(*data));
+            *data = (*data) + 1;
+            pthread_mutex_unlock(mtx);
+            mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+            this->server->set_db_path("pymongols.leveldb/" + i);
+            this->server->run_with_route(f);
+        };
+
+        std::function<bool(int)> gg = [&](int status) {
+            return false;
+        };
+
+        mongols::multi_process main_process;
+        main_process.run(ff, gg);
     }
     void set_session_expires(long long expires)
     {
@@ -165,8 +211,10 @@ private:
     void create_pidfile()
     {
         if (!this->pidfile.empty()) {
-            std::ofstream file(this->pidfile);
+            std::ofstream file;
+            file.open(this->pidfile, std::ios::trunc | std::ios::out);
             file << getpid();
+            file.close();
         }
     }
 };

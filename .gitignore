@@ -50,7 +50,8 @@ wheels/
 .installed.cfg
 *.egg
 
-/.vscode
+.vscode
 *.pyc
 *.cache
 *.pid
+pymongols.leveldb/
