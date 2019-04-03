@@ -5,10 +5,8 @@
 
 PYBIND11_MODULE(pymongols, m)
 {
-    m.doc() = "pybind11 pymongols plugin";
-    //pybind11::bind_vector<std::vector<std::string>>(m, "VectorString");
-    
-
+    m.doc() = "The fastest python http server,pybind11 pymongols plugin,version-0.1.7";
+ 
     pybind11::class_<mongols::request> request(m, "request");
     request.def(pybind11::init<>())
         .def_readwrite("client", &mongols::request::client)
