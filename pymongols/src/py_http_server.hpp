@@ -10,6 +10,8 @@
 #include <mongols/util.hpp>
 #include <unistd.h>
 
+#define PYMONGOLS_LEVELDB_DIR "pymongols.leveldb"
+
 class py_http_server {
 public:
     py_http_server() = delete;
@@ -24,9 +26,6 @@ public:
     {
         if (this->server) {
             delete this->server;
-            if (!this->pidfile.empty()) {
-                remove(this->pidfile.c_str());
-            }
         }
     }
     void run(pybind11::function req_filter, pybind11::function res_filter)
@@ -53,7 +52,9 @@ public:
             i = std::move(std::to_string(*data));
             *data = (*data) + 1;
             pthread_mutex_unlock(mtx);
-            mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+            if (!mongols::is_dir("pymongols.leveldb")) {
+                mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+            }
             this->server->set_db_path("pymongols.leveldb/" + i);
             this->server->run(f, g);
         };
@@ -64,6 +65,9 @@ public:
 
         mongols::multi_process main_process;
         main_process.run(ff, gg);
+        if (!this->pidfile.empty()) {
+            remove(this->pidfile.c_str());
+        }
     }
 
     void add_route(const std::list<std::string>& method, const std::string& pattern, pybind11::function fun)
@@ -94,7 +98,9 @@ public:
             i = std::move(std::to_string(*data));
             *data = (*data) + 1;
             pthread_mutex_unlock(mtx);
-            mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+            if (!mongols::is_dir("pymongols.leveldb")) {
+                mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+            }
             this->server->set_db_path("pymongols.leveldb/" + i);
             this->server->run_with_route(f);
         };
@@ -105,7 +111,15 @@ public:
 
         mongols::multi_process main_process;
         main_process.run(ff, gg);
+        if (!this->pidfile.empty()) {
+            remove(this->pidfile.c_str());
+        }
+        if (this->server) {
+            delete this->server;
+            this->server = 0;
+        }
     }
+
     void set_session_expires(long long expires)
     {
         this->server->set_session_expires(expires);
