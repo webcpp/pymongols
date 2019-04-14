@@ -35,6 +35,17 @@ def tpl(req, res, param):
     res.status = 200
 
 
+@app.route(r'^/session/?$', ['GET'])
+def sess(req, res, param):
+    if 'test' in req.session:
+        res.set_session('test', str(int(req.session['test'])+1))
+        res.content = req.session['test']
+    else:
+        res.set_session('test', '0')
+        res.content = 'null'
+    res.status = 200
+
+
 def req_filter(req):
     return True
 
@@ -57,7 +68,7 @@ server = pymongols.http_server(config['host'], config['port'], config['timeout']
                                config['thread_size'], config['max_body_size'], config['max_event_size'])
 
 # server.set_enable_daemon(True)
-server.set_pidfile("test2.pid")
+# server.set_pidfile("test2.pid")
 # server.set_enable_lru_cache(True)
 # server.set_lru_cache_expires(1)
 server.set_enable_session(True)
