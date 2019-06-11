@@ -1,11 +1,10 @@
 #ifndef PY_WEB_SERVER
 #define PY_WEB_SERVER
 
-#include <unistd.h>
 #include <fstream>
 #include <mongols/util.hpp>
 #include <mongols/web_server.hpp>
-
+#include <unistd.h>
 
 class py_web_server {
 public:
@@ -13,6 +12,7 @@ public:
     py_web_server(const std::string& host, int port, int timeout, size_t buffer_size, size_t thread_size, size_t max_body_size, int max_event_size)
         : server(0)
         , is_daemon(false)
+        , enable_multiple_processes(false)
         , pidfile()
     {
         this->server = new mongols::web_server(host, port, timeout, buffer_size, thread_size, max_body_size, max_event_size);
@@ -36,20 +36,26 @@ public:
             return false;
         };
 
-        //this->server->run(f);
-
-        std::function<void(pthread_mutex_t*, size_t*)> ff = [&](pthread_mutex_t* mtx, size_t* data) {
+        if (!this->enable_multiple_processes) {
             this->server->run(f);
-        };
+        } else {
+            std::function<void(pthread_mutex_t*, size_t*)> ff = [&](pthread_mutex_t* mtx, size_t* data) {
+                this->server->run(f);
+            };
 
-        std::function<bool(int)> g = [&](int status) {
-            return false;
-        };
+            std::function<bool(int)> g = [&](int status) {
+                return false;
+            };
 
-        mongols::multi_process main_process;
-        main_process.run(ff, g);
+            mongols::multi_process main_process;
+            main_process.run(ff, g);
+        }
         if (!this->pidfile.empty()) {
             remove(this->pidfile.c_str());
+        }
+        if (this->server) {
+            delete this->server;
+            this->server = 0;
         }
     }
     void set_root_path(const std::string& path)
@@ -98,6 +104,11 @@ public:
         this->is_daemon = b;
     }
 
+    void set_enable_multiple_processes(bool b)
+    {
+        this->enable_multiple_processes = b;
+    }
+
     void set_pidfile(const std::string& path)
     {
         this->pidfile = path;
@@ -126,7 +137,7 @@ public:
 
 private:
     mongols::web_server* server;
-    bool is_daemon;
+    bool is_daemon, enable_multiple_processes;
     std::string pidfile;
 
 private:

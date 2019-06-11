@@ -18,6 +18,7 @@ public:
     py_http_server(const std::string& host, int port, int timeout, size_t buffer_size, size_t thread_size, size_t max_body_size, int max_event_size)
         : server(0)
         , is_daemon(false)
+        , enable_multiple_processes(false)
         , pidfile()
     {
         this->server = new mongols::http_server(host, port, timeout, buffer_size, thread_size, max_body_size, max_event_size);
@@ -41,32 +42,38 @@ public:
             res_filter(req, &res);
         };
 
-        //        this->server->run(f, g);
-
-        std::function<void(pthread_mutex_t*, size_t*)> ff = [&](pthread_mutex_t* mtx, size_t* data) {
-            std::string i;
-            pthread_mutex_lock(mtx);
-            if (*data > std::thread::hardware_concurrency() - 1) {
-                *data = 0;
-            }
-            i = std::move(std::to_string(*data));
-            *data = (*data) + 1;
-            pthread_mutex_unlock(mtx);
-            if (!mongols::is_dir("pymongols.leveldb")) {
-                mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
-            }
-            this->server->set_db_path("pymongols.leveldb/" + i);
+        if (!this->enable_multiple_processes) {
             this->server->run(f, g);
-        };
+        } else {
+            std::function<void(pthread_mutex_t*, size_t*)> ff = [&](pthread_mutex_t* mtx, size_t* data) {
+                std::string i;
+                pthread_mutex_lock(mtx);
+                if (*data > std::thread::hardware_concurrency() - 1) {
+                    *data = 0;
+                }
+                i = std::move(std::to_string(*data));
+                *data = (*data) + 1;
+                pthread_mutex_unlock(mtx);
+                if (!mongols::is_dir("pymongols.leveldb")) {
+                    mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+                }
+                this->server->set_db_path("pymongols.leveldb/" + i);
+                this->server->run(f, g);
+            };
 
-        std::function<bool(int)> gg = [&](int status) {
-            return false;
-        };
+            std::function<bool(int)> gg = [&](int status) {
+                return false;
+            };
 
-        mongols::multi_process main_process;
-        main_process.run(ff, gg);
+            mongols::multi_process main_process;
+            main_process.run(ff, gg);
+        }
         if (!this->pidfile.empty()) {
             remove(this->pidfile.c_str());
+        }
+        if (this->server) {
+            delete this->server;
+            this->server = 0;
         }
     }
 
@@ -87,30 +94,33 @@ public:
         auto f = [&](const mongols::request& req) {
             return pybind11::cast<bool>(req_filter(req));
         };
-        //this->server->run_with_route(f);
 
-        std::function<void(pthread_mutex_t*, size_t*)> ff = [&](pthread_mutex_t* mtx, size_t* data) {
-            std::string i;
-            pthread_mutex_lock(mtx);
-            if (*data > std::thread::hardware_concurrency() - 1) {
-                *data = 0;
-            }
-            i = std::move(std::to_string(*data));
-            *data = (*data) + 1;
-            pthread_mutex_unlock(mtx);
-            if (!mongols::is_dir("pymongols.leveldb")) {
-                mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
-            }
-            this->server->set_db_path("pymongols.leveldb/" + i);
+        if (!this->enable_multiple_processes) {
             this->server->run_with_route(f);
-        };
+        } else {
+            std::function<void(pthread_mutex_t*, size_t*)> ff = [&](pthread_mutex_t* mtx, size_t* data) {
+                std::string i;
+                pthread_mutex_lock(mtx);
+                if (*data > std::thread::hardware_concurrency() - 1) {
+                    *data = 0;
+                }
+                i = std::move(std::to_string(*data));
+                *data = (*data) + 1;
+                pthread_mutex_unlock(mtx);
+                if (!mongols::is_dir("pymongols.leveldb")) {
+                    mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+                }
+                this->server->set_db_path("pymongols.leveldb/" + i);
+                this->server->run_with_route(f);
+            };
 
-        std::function<bool(int)> gg = [&](int status) {
-            return false;
-        };
+            std::function<bool(int)> gg = [&](int status) {
+                return false;
+            };
 
-        mongols::multi_process main_process;
-        main_process.run(ff, gg);
+            mongols::multi_process main_process;
+            main_process.run(ff, gg);
+        }
         if (!this->pidfile.empty()) {
             remove(this->pidfile.c_str());
         }
@@ -190,6 +200,11 @@ public:
         this->is_daemon = b;
     }
 
+    void set_enable_multiple_processes(bool b)
+    {
+        this->enable_multiple_processes = b;
+    }
+
     void set_pidfile(const std::string& path)
     {
         this->pidfile = path;
@@ -218,7 +233,7 @@ public:
 
 private:
     mongols::http_server* server;
-    bool is_daemon;
+    bool is_daemon, enable_multiple_processes;
     std::string pidfile;
 
 private:
