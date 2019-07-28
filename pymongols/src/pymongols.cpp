@@ -4,7 +4,7 @@
 
 PYBIND11_MODULE(pymongols, m)
 {
-    m.doc() = "The fastest python http server and web server,pybind11 pymongols plugin,version-0.2.2";
+    m.doc() = "The fastest python http server and web server,pybind11 pymongols plugin,version-0.2.3";
 
     pybind11::class_<mongols::request> request(m, "request");
     request.def(pybind11::init<>())
@@ -13,11 +13,6 @@ PYBIND11_MODULE(pymongols, m)
         .def_readwrite("user_agent", &mongols::request::user_agent)
         .def_readwrite("method", &mongols::request::method)
         .def_readwrite("param", &mongols::request::param)
-        .def_readwrite("host", &mongols::request::host)
-        .def_readwrite("fragment", &mongols::request::fragment)
-        .def_readwrite("user_info", &mongols::request::user_info)
-        .def_readwrite("schema", &mongols::request::schema)
-        .def_readwrite("port", &mongols::request::port)
         .def_readwrite("headers", &mongols::request::headers)
         .def_readwrite("form", &mongols::request::form)
         .def_readwrite("cache", &mongols::request::cache)
