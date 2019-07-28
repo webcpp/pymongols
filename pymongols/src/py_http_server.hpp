@@ -54,10 +54,10 @@ public:
                 i = std::move(std::to_string(*data));
                 *data = (*data) + 1;
                 pthread_mutex_unlock(mtx);
-                if (!mongols::is_dir("pymongols.leveldb")) {
-                    mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+                if (!mongols::is_dir(PYMONGOLS_LEVELDB_DIR)) {
+                    mkdir(PYMONGOLS_LEVELDB_DIR, S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
                 }
-                this->server->set_db_path("pymongols.leveldb/" + i);
+                this->server->set_db_path(std::string(PYMONGOLS_LEVELDB_DIR).append("/").append(i));
                 this->server->run(f, g);
             };
 
@@ -107,10 +107,10 @@ public:
                 i = std::move(std::to_string(*data));
                 *data = (*data) + 1;
                 pthread_mutex_unlock(mtx);
-                if (!mongols::is_dir("pymongols.leveldb")) {
-                    mkdir("pymongols.leveldb", S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
+                if (!mongols::is_dir(PYMONGOLS_LEVELDB_DIR)) {
+                    mkdir(PYMONGOLS_LEVELDB_DIR, S_IRUSR | S_IWUSR | S_IXUSR | S_IROTH | S_IWOTH | S_IXOTH);
                 }
-                this->server->set_db_path("pymongols.leveldb/" + i);
+                this->server->set_db_path(std::string(PYMONGOLS_LEVELDB_DIR).append("/").append(i));
                 this->server->run_with_route(f);
             };
 

@@ -55,3 +55,4 @@ wheels/
 *.cache
 *.pid
 pymongols.leveldb/
+mongols_leveldb/
