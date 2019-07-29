@@ -4,7 +4,7 @@ import re
 import sys
 
 __author__ = 'pangpang@hi-nginx.com'
-__version__ = '0.1.6'
+__version__ = '0.1.7'
 __license__ = 'Mozilla Public License Version 2.0'
 
 if sys.version_info.major < 3:
@@ -43,9 +43,12 @@ class application:
         return wrapper_a
 
     def run(self, req, res):
-        for k, v in self.uri_map.items():
-            if req.method in v['method']:
-                m = self.uri_regex_map[k].match(req.uri)
+        items = self.uri_map.items()
+        method = req.method
+        reg_map = self.uri_regex_map
+        for k, v in items:
+            if method in v['method']:
+                m = reg_map[k].match(req.uri)
                 if m:
                     v['callback'](req, res, m.groupdict())
                     break
