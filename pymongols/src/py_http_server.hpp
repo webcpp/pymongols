@@ -210,6 +210,23 @@ public:
         this->pidfile = path;
     }
 
+    void set_whitelist(const std::string& ip)
+    {
+        this->set_whitelist(ip);
+    }
+    void del_whitelist(const std::string& ip)
+    {
+        this->del_whitelist(ip);
+    }
+    void set_whitelist_file(const std::string& path)
+    {
+        this->set_whitelist_file(path);
+    }
+    void set_enable_whitelist(bool b)
+    {
+        this->set_enable_whitelist(b);
+    }
+
     static void set_blacklist_size(size_t size)
     {
         mongols::tcp_server::backlist_size = size;

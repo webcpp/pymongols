@@ -4,7 +4,7 @@
 
 PYBIND11_MODULE(pymongols, m)
 {
-    m.doc() = "The fastest python http server and web server,pybind11 pymongols plugin,version-0.2.3";
+    m.doc() = "The fastest python http server and web server,pybind11 pymongols plugin,version-0.2.4";
 
     pybind11::class_<mongols::request> request(m, "request");
     request.def(pybind11::init<>())
@@ -51,6 +51,10 @@ PYBIND11_MODULE(pymongols, m)
         .def("set_openssl", &py_http_server::set_openssl)
         .def("set_enable_blacklist", &py_http_server::set_enable_blacklist)
         .def("set_enable_security_check", &py_http_server::set_enable_security_check)
+        .def("set_enable_whitelist",&py_http_server::set_enable_whitelist)
+        .def("set_whitelist",&py_http_server::set_whitelist)
+        .def("del_whitelist",&py_http_server::del_whitelist)
+        .def("set_whitelist_file",&py_http_server::set_whitelist_file)
         .def_static("set_blacklist_size", &py_http_server::set_blacklist_size)
         .def_static("set_blacklist_timeout", &py_http_server::set_blacklist_timeout)
         .def_static("set_max_connection_limit", &py_http_server::set_max_connection_limit)
@@ -73,6 +77,10 @@ PYBIND11_MODULE(pymongols, m)
         .def("set_openssl", &py_web_server::set_openssl)
         .def("set_enable_blacklist", &py_web_server::set_enable_blacklist)
         .def("set_enable_security_check", &py_web_server::set_enable_security_check)
+        .def("set_enable_whitelist",&py_web_server::set_enable_whitelist)
+        .def("set_whitelist",&py_web_server::set_whitelist)
+        .def("del_whitelist",&py_web_server::del_whitelist)
+        .def("set_whitelist_file",&py_web_server::set_whitelist_file)
         .def_static("set_blacklist_size", &py_web_server::set_blacklist_size)
         .def_static("set_blacklist_timeout", &py_web_server::set_blacklist_timeout)
         .def_static("set_max_connection_limit", &py_web_server::set_max_connection_limit)
