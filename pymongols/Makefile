@@ -15,8 +15,16 @@ OBJ=$(COBJ) $(CXXOBJ) $(CCOBJ) $(CPPOBJ)
 CC=gcc
 CXX=g++
 
-CFLAGS+=-O3 -std=c11 -Wall -fPIC `python$(PYVERSION)-config --cflags` `pkg-config --cflags mongols openssl`
-CXXFLAGS+=-O3 -std=c++11 -Wall -fPIC `python$(PYVERSION)-config --cflags` `pkg-config --cflags mongols openssl`
+BOTHFLAGS:=-Wall -fPIC `python$(PYVERSION)-config --cflags` \
+			-Wno-attributes 
+
+CFLAGS+=-O3 -std=c11  `pkg-config --cflags mongols openssl`
+CXXFLAGS+=-O3 -std=c++11  `pkg-config --cflags mongols openssl`
+
+CFLAGS+=$(BOTHFLAGS)
+CXXFLAGS+=$(BOTHFLAGS)
+
+
 LDLIBS+=`python$(PYVERSION)-config --libs` `pkg-config --libs mongols openssl`
 LDFLAGS+=-shared
 
