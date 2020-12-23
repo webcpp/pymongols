@@ -1,4 +1,4 @@
-PYVERSION=3.5
+PYVERSION=3.8
 PROJECT=pymongols$(shell python$(PYVERSION)-config --extension-suffix)
 CPPSRC=$(shell find src -type f -name *.cpp)
 CPPOBJ=$(patsubst %.cpp,%.o,$(CPPSRC))
@@ -25,7 +25,7 @@ CFLAGS+=$(BOTHFLAGS)
 CXXFLAGS+=$(BOTHFLAGS)
 
 
-LDLIBS+=`python$(PYVERSION)-config --libs` `pkg-config --libs mongols openssl`
+LDLIBS+=`python$(PYVERSION)-config --libs` -lpython$(PYVERSION) `pkg-config --libs mongols openssl`
 LDFLAGS+=-shared
 
 
