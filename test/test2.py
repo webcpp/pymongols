@@ -69,7 +69,7 @@ server = pymongols.http_server(config['host'], config['port'], config['timeout']
 
 # server.set_enable_daemon(True)
 server.set_enable_multiple_processes(True)
-server.set_pidfile("test2.pid")
+server.set_pidfile(__file__+".pid")
 # server.set_enable_lru_cache(True)
 # server.set_lru_cache_expires(1)
 server.set_enable_session(True)

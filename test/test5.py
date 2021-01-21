@@ -1,13 +1,12 @@
 import pymongols
-
+from demo.index import main
 
 def req_filter(req):
     return True
 
 
 def res_filter(req, res):
-    res.content = 'hello,world'
-    res.status = 200
+    main(req, res)
 
 
 config = {}
@@ -28,5 +27,6 @@ server.set_enable_multiple_processes(True)
 server.set_pidfile(__file__+".pid")
 # server.set_enable_lru_cache(True)
 # server.set_lru_cache_expires(1)
+server.set_enable_session(True)
 
 server.run(req_filter, res_filter)

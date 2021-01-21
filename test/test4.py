@@ -20,6 +20,6 @@ server.set_list_directory(True)
 server.set_enable_mmap(True)
 # server.set_enable_daemon(True)
 server.set_enable_multiple_processes(True)
-server.set_pidfile("test4.pid")
+server.set_pidfile(__file__+".pid")
 
 server.run()
