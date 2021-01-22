@@ -4,7 +4,7 @@
 
 PYBIND11_MODULE(pymongols, m)
 {
-    m.doc() = "The fastest python http server and web server,pybind11 pymongols plugin,version-0.2.4";
+    m.doc() = "The fastest python http server and web server,pybind11 pymongols plugin,version-0.2.5";
 
     pybind11::class_<mongols::request> request(m, "request");
     request.def(pybind11::init<>())
@@ -29,6 +29,7 @@ PYBIND11_MODULE(pymongols, m)
 
     pybind11::class_<py_http_server> http_server(m, "http_server");
     http_server.def(pybind11::init<const std::string&, int, int, size_t, size_t, size_t, int>())
+        .def(pybind11::init<pybind11::dict>())
         .def("run", &py_http_server::run)
         .def("add_route", &py_http_server::add_route)
         .def("run_with_route", &py_http_server::run_with_route)
@@ -63,6 +64,7 @@ PYBIND11_MODULE(pymongols, m)
 
     pybind11::class_<py_web_server> web_server(m, "web_server");
     web_server.def(pybind11::init<const std::string&, int, int, size_t, size_t, size_t, int>())
+        .def(pybind11::init<pybind11::dict>())
         .def("run", &py_web_server::run)
         .def("set_enable_daemon", &py_web_server::set_enable_daemon)
         .def("set_enable_multiple_processes", &py_web_server::set_enable_multiple_processes)

@@ -17,6 +17,21 @@ public:
     {
         this->server = new mongols::web_server(host, port, timeout, buffer_size, thread_size, max_body_size, max_event_size);
     }
+    py_web_server(pybind11::dict config)
+        : server(0)
+        , is_daemon(false)
+        , enable_multiple_processes(false)
+        , pidfile()
+    {
+        std::string host = config.contains("host")?pybind11::str(config["host"]):"127.0.0.1";
+        int port =config.contains("port")?pybind11::cast<int>(config["port"]):9090;
+        int timeout = config.contains("timeout")?pybind11::cast<int>(config["timeout"]):5000;
+        size_t buffer_size = config.contains("buffer_size")?pybind11::cast<size_t>(config["buffer_size"]):8192;
+        int thread_size = 0;
+        size_t max_body_size = config.contains("max_body_size")?pybind11::cast<size_t>(config["max_body_size"]):4096;
+        int max_event_size = config.contains("max_body_size")?pybind11::cast<int>(config["max_body_size"]):64;
+        this->server = new mongols::web_server(host, port, timeout, buffer_size, thread_size, max_body_size, max_event_size);
+    }
     virtual ~py_web_server()
     {
         if (this->server) {
