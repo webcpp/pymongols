@@ -1,7 +1,9 @@
 # dependency
-- python2,3
+- python2 or 3
 - setuptools
 - jinja2
+- PyMySQL
+- DBUtils
 
 ## usage
 
