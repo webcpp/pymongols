@@ -2,11 +2,11 @@ from functools import wraps
 from jinja2 import Environment, FileSystemLoader, FileSystemBytecodeCache, select_autoescape, Template
 import pymysql
 from dbutils.pooled_db import PooledDB
-import re
+import regex as re
 import sys
 
 __author__ = 'pangpang@hi-nginx.com'
-__version__ = '0.1.10'
+__version__ = '0.1.11'
 __license__ = 'Mozilla Public License Version 2.0'
 
 if sys.version_info.major < 3:

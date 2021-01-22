@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 app = application()
 
 
-@app.route(r'^/(?P<module>.+)/?$',['GET','POST'])
+@app.route(r'^/(?P<module>.+)/?$',['GET','POST','PUT','DELETE','PATCH'])
 def controller(req,res,param):
     try:
         index = importlib.import_module('.index',param['module'].replace("/","."))
